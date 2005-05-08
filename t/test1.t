@@ -11,7 +11,7 @@ BEGIN { use_ok( 'Crypt::AppleTwoFish' ); }
 
 my $object = new Crypt::AppleTwoFish($s);
 isa_ok ($object, 'Crypt::AppleTwoFish');
-my $sd = $object->decrypted;
+my $sd = $object->decrypted_for_iTMS;
 my $shx = sprintf("%x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x", 
   map { ord }  split //, $sd);
 
