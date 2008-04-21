@@ -7,3 +7,5 @@ Revision history for Perl module Crypt::AppleTwoFish
     - added support for DRMS key decryption keys along with the 
       original iTMS support
 
+0.03 Sun 20 April 2008
+	- pod changes, add pod testing

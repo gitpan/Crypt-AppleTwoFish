@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 
 my(@apple_tf_iTMS, @apple_tf_DRMS);
 
@@ -625,6 +625,20 @@ Returns the unscrambled key for use with the Apple Music Store.
 =item B<decrypted_for_DRMS>
 
 Returns the unscrambled key for use with iTunes/iPod DRM.
+
+=item key
+
+key data field get/set
+
+=item process_DRMS_key
+
+process key for DRMS
+
+=item process_iTMS_key
+
+process key for iTMS
+
+=back
 
 =head1 AUTHOR 
 

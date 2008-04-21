@@ -7,4 +7,5 @@ WriteMakefile(
     AUTHOR       => 'William Hererra (whererra@skylightview.com)',
     ABSTRACT     => 'An Apple iTMS internal key descrambling algorithm',
     PREREQ_PM    => { Carp },
+    LICENSE      => 'perl',
 );
