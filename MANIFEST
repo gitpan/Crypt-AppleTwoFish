@@ -4,8 +4,8 @@ README
 Todo
 Changes
 lib/Crypt/AppleTwoFish.pm
-t/test1.t
-t/pod.t
-t/pod_coverage.t
+t/01_test1.t
+t/02_pod.t
+t/03_pod_coverage.t
 Makefile.PL
 META.yml                                 Module meta-data (added by MakeMaker)
