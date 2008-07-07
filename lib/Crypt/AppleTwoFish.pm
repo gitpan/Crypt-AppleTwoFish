@@ -6,7 +6,7 @@ use Digest::SHA;
 use Math::BigInt;
 use Carp qw( carp );
 
-our $VERSION = "0.05";
+our $VERSION = "0.051";
 
 #--- lookup tables declared here are defined after the other package code ---#
 
@@ -94,9 +94,9 @@ sub _fumigate {
     my $i   = 0;
     my $sum = 0;
     for my $byte (@bytes) {
-        my $rshifter = $i * 8;
-        my $shifted  = 1 << $rshifter;
-        my $n        = _crop_duster($byte) << $rshifter;
+        my $lshifter = $i * 8;
+        my $shifted  = 1 << $lshifter;
+        my $n        = _crop_duster($byte) << $lshifter;
         my $m        = ( $n + $shifted + 0xFFFFFFFF ) | ( -1 - $sum );
         $sum += $m - $shifted - $n + 1;
         ++$i;
@@ -325,12 +325,11 @@ sub harvest_veggies {
     my $ndigest_bytes = '0x' . join q{},
       _dust( @digest_bytes[ 0 .. $nsize - 1 ] );
     $ndigest_bytes = substr $ndigest_bytes, 0, ( $nsize * 2 ) + 2;
-    my $nd;
-    eval "\$nd = $ndigest_bytes";
+    my $nd = Math::BigInt->new($ndigest_bytes);
     my $nbytes_str = '0x' . join q{},
       map { length $_ > 1 ? $_ : '0' . $_ } _dust(@bytes);
-    my $nbytes;
-    eval "\$nbytes = $nbytes_str";
+    my $nbytes = Math::BigInt->new($nbytes_str);
+    # print "nbytes_str is $nbytes_str, nybytes is $nbytes\n" if $self->{DEBUG};
     my $nB2            = 0xFFFFFFFFFFFFFFF9C31A00000000000933CCD065;
     my $n00            = 0x100000000000000063CE600000000001DB577CE3F;
     my $n1             = 1;
@@ -341,31 +340,16 @@ sub harvest_veggies {
         $nbytes *= $nbytes;
         if ( $nd & ( 1 << $i ) ) {
             $n1 = $nbytes - $n1;
-            my $m = $n1 >> 159;
-            $m *= $n00;
-            $m >>= 161;
-            $m *= $nB2;
-            $n1 -= $m;
-            $n1 %= $nB2;
-            $m = $nbytes >> 159;
-            $m *= $n00;
-            $m >>= 161;
-            $m *= $nB2;
-            $nbytes -= $m;
-            $nbytes %= $nB2;
+            my $m = ( ( ( $n1 >> 159 ) * $n00 ) >> 161 ) * $nB2;
+            $n1 = ( $n1 - $m ) % $nB2;
+            $m = ( ( ( $nbytes >> 159 ) * $n00 )>> 161 ) * $nB2;
+            $nbytes = ( $nbytes - $m ) % $nB2;
         }
         else {
             $nbytes -= $n1;
-            my $m = $nbytes >> 159;
-            $m *= $n00;
-            $m >>= 161;
-            $m *= $nB2;
-            $nbytes -= $m;
-            $nbytes %= $nB2;
-            $m = $n1 >> 159;
-            $m *= $n00;
-            $m >>= 161;
-            $m *= $nB2;
+            my $m = ( ( ( $nbytes >> 159 ) * $n00 ) >> 161 )* $nB2;
+            $nbytes = ( $nbytes - $m )% $nB2;
+            $m = ( ( ( $n1 >> 159 ) * $n00 ) >> 161 ) * $nB2;
             $n1 -= $m;
             $nbytes %= $nB2;
         }
@@ -381,7 +365,7 @@ sub harvest_veggies {
     $sha1->reset;
     $sha1->add($digest_fodder);
     my $key_key = substr $sha1->digest, 1, 16;
-    print "meta key is ", $key_key, "\n" if $self->{DEBUG};
+    print "The key key (for the priv keys) is $key_key\n" if $self->{DEBUG};
     return $key_key;
 }
 
@@ -1515,12 +1499,14 @@ and lookup tables, and might have started out something like Twofish or Blowfish
 
     ..and for iTunes 7 compatible usages:
     
-    Functions cloned from lower level compiled code which was deliberately
-    intended to confusing and aimlessly cryptic cannot easily be given sensible
-    names.  Ada is good, but dull.  We chose to be amused during the tedium by 
-    coming up with function names from a vegetable farm. 
+    Functions cloned from lower level compiled code which was likely intended
+    to be difficult to reconstruct cannot easily be given sensible names. Ada 
+    Pro is good, but dull.  We chose to be amused during the tedium by coming 
+    up with function names from a vegetable farm. 
     
-    For actual usage, see L<iTunes::Sid>.
+    For actual usage, see also:
+    
+L<iTunes::Sid>.
 
 =head1 METHODS
 
@@ -1565,7 +1551,7 @@ Returns the unscrambled key for use with iTunes/iPod DRM.
 
 =item B<userID>
 
-    Get/set user ID.  3 bytes.
+    Get/set user ID.  4 bytes.
 
 =item B<plant_veggies>
 
@@ -1614,6 +1600,7 @@ Questions, feature requests and bug reports should go to
     its intended purpose is legal and legitimate under any applicable US or EU 
     law, as above, and agree that any and all risk as to the quality, 
     performance, and legality of this code lies with you.
+    
 =back
 
 =cut

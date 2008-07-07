@@ -1,11 +1,11 @@
 --- #YAML:1.0
 name:                Crypt-AppleTwoFish
-version:             0.05
+version:             0.051
 abstract:            An Apple iTMS internal key descrambling algorithm
 license:             Other
 author:              
     - William Hererra (whererra@skylightview.com)
-generated_by:        ExtUtils::MakeMaker version 6.42_01
+generated_by:        ExtUtils::MakeMaker version 6.44
 distribution_type:   module
 requires:     
     Carp:                          0
